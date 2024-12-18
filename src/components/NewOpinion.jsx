@@ -1,21 +1,27 @@
 import { useActionState } from "react";
 
 export function NewOpinion() {
-  const handleSubmit = async (prevState, formData) => {
-    const fields = Object.fromEntries(formData);
+  const shareOpinionAction = async (prevState, formData) => {
+    const enteredValues = Object.fromEntries(formData);
 
     let errors = [];
-    if (fields.body.trim().length < 6) {
-      errors.push("Your opinion should be not less 6 characters");
+    if (enteredValues.title.trim().length < 5) {
+      errors.push("Title must be at least five characters long.");
+    }
+    if (
+      enteredValues.body.trim().length < 10 ||
+      enteredValues.body.trim().length > 300
+    ) {
+      errors.push("Your opinion must be between 10 and 300 characters long.");
     }
 
     if (errors.length) {
-      return { errors, fields };
+      return { errors, enteredValues };
     }
     return { errors: null, success: true };
   };
 
-  const [state, formAction] = useActionState(handleSubmit, {
+  const [formState, formAction] = useActionState(shareOpinionAction, {
     errors: null,
   });
 
@@ -31,7 +37,7 @@ export function NewOpinion() {
               id="userName"
               name="userName"
               required
-              defaultValue={state.fields?.userName}
+              defaultValue={formState.enteredValues?.userName}
             />
           </p>
 
@@ -42,7 +48,7 @@ export function NewOpinion() {
               id="title"
               name="title"
               required
-              defaultValue={state.fields?.title}
+              defaultValue={formState.enteredValues?.title}
             />
           </p>
         </div>
@@ -52,18 +58,18 @@ export function NewOpinion() {
             id="body"
             name="body"
             rows={5}
-            defaultValue={state.fields?.body}
+            defaultValue={formState.enteredValues?.body}
           ></textarea>
         </p>
 
-        {state.errors && (
-          <ul>
-            {state.errors.map((error) => (
+        {formState.errors && (
+          <ul className="errors">
+            {formState.errors.map((error) => (
               <li key={error}>{error}</li>
             ))}
           </ul>
         )}
-        {state.success && <p>Your opinion was submitted!</p>}
+        {formState.success && <p>Your opinion was submitted!</p>}
         <p className="actions">
           <button type="submit">Submit</button>
         </p>
