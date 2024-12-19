@@ -1,6 +1,7 @@
 import { use } from "react";
 import { useActionState } from "react";
 import { OpinionsContext } from "../store/opinions-context";
+import Submit from "./Submit";
 
 export function NewOpinion() {
   const { addOpinion } = use(OpinionsContext);
@@ -76,11 +77,7 @@ export function NewOpinion() {
           </ul>
         )}
         {formState.success && <p>Your opinion was submitted!</p>}
-        <p className="actions">
-          <button disabled={pending} type="submit">
-            Submit
-          </button>
-        </p>
+        <Submit />
       </form>
     </div>
   );
