@@ -1,7 +1,11 @@
+import { use } from "react";
 import { useActionState } from "react";
+import { OpinionsContext } from "../store/opinions-context";
 
 export function NewOpinion() {
-  const shareOpinionAction = async (prevState, formData) => {
+  const { addOpinion } = use(OpinionsContext);
+
+  async function shareOpinionAction(prevState, formData) {
     const enteredValues = Object.fromEntries(formData);
 
     let errors = [];
@@ -18,10 +22,12 @@ export function NewOpinion() {
     if (errors.length) {
       return { errors, enteredValues };
     }
-    return { errors: null, success: true };
-  };
 
-  const [formState, formAction] = useActionState(shareOpinionAction, {
+    await addOpinion(enteredValues);
+    return { errors: null, success: true };
+  }
+
+  const [formState, formAction, pending] = useActionState(shareOpinionAction, {
     errors: null,
   });
 
@@ -71,7 +77,9 @@ export function NewOpinion() {
         )}
         {formState.success && <p>Your opinion was submitted!</p>}
         <p className="actions">
-          <button type="submit">Submit</button>
+          <button disabled={pending} type="submit">
+            Submit
+          </button>
         </p>
       </form>
     </div>
