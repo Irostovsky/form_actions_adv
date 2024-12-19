@@ -28,7 +28,7 @@ export function NewOpinion() {
     return { errors: null, success: true };
   }
 
-  const [formState, formAction, pending] = useActionState(shareOpinionAction, {
+  const [formState, formAction] = useActionState(shareOpinionAction, {
     errors: null,
   });
 
