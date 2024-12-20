@@ -1,22 +1,27 @@
 import { use } from "react";
 import { OpinionsContext } from "../store/opinions-context";
 import { useActionState } from "react";
+import { useOptimistic } from "react";
 
 export function Opinion({ opinion: { id, title, body, userName, votes } }) {
   const { upvoteOpinion, downvoteOpinion } = use(OpinionsContext);
+  const [optimisticVotes, setVotesOptimistically] = useOptimistic(votes, (prevVotes, mode) =>
+    mode === "up" ? prevVotes + 1 : prevVotes - 1
+  );
 
   async function upvoteAction() {
+    setVotesOptimistically("up");
     await upvoteOpinion(id);
   }
 
   async function downvoteAction() {
+    setVotesOptimistically("down");
     await downvoteOpinion(id);
   }
 
-  const [upvoteFormState, upvoteFormAction, upvoteFormPending] =
-    useActionState(upvoteAction);
-  const [downvoteFormState, downvoteFormAction, downvoteFormPending] =
-    useActionState(downvoteAction);
+  const [upvoteFormState, upvoteFormAction, upvoteFormPending] = useActionState(upvoteAction);
+  const [downvoteFormState, downvoteFormAction, downvoteFormPending] = useActionState(downvoteAction);
+
   return (
     <article>
       <header>
@@ -25,10 +30,7 @@ export function Opinion({ opinion: { id, title, body, userName, votes } }) {
       </header>
       <p>{body}</p>
       <form className="votes">
-        <button
-          formAction={upvoteFormAction}
-          disabled={upvoteFormPending || downvoteFormPending}
-        >
+        <button formAction={upvoteFormAction} disabled={upvoteFormPending || downvoteFormPending}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -46,12 +48,9 @@ export function Opinion({ opinion: { id, title, body, userName, votes } }) {
           </svg>
         </button>
 
-        <span>{votes}</span>
+        <span>{optimisticVotes}</span>
 
-        <button
-          formAction={downvoteFormAction}
-          disabled={upvoteFormPending || downvoteFormPending}
-        >
+        <button formAction={downvoteFormAction} disabled={upvoteFormPending || downvoteFormPending}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
